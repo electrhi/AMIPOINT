@@ -12,27 +12,28 @@ Render의 Build Command는 `npm run build`, Publish Directory는 프로젝트 �
 ## 계정 권한
 
 - 관리자: 전체 날짜/전체 조 실적 조회, 기간별 엑셀 다운로드, 조 수량 설정
-- 작업자: 담당 조만 확인, 날짜 선택, 해당 날짜 수량 입력, 이전 날짜 수량 확인, 저장
+- 작업자: 담당 권역/조만 확인, 날짜 선택, 해당 날짜 수량 입력, 이전 날짜 수량 확인, 저장
 
 ## 기본 생성 계정
 
-- 관리자: `admin` / `9999`
-- 작업자: `worker01` / `1001` / 담당 `1조`
+- 관리자/작업자 계정은 Supabase `work_users`에 일괄 추가되어 있습니다.
+- 계정별 `password`, `team_no`, `region_no`, `worker_type`을 Table Editor에서 확인할 수 있습니다.
+- `team_no`가 비어 있는 작업자는 로그인은 가능하지만 입력 표가 표시되지 않습니다.
 
 비밀번호는 Supabase `work_users.password`에 숫자/문자 그대로 저장됩니다.
 
 ## 사용자 추가 예시
 
 ```sql
-insert into public.work_users (login_id, password, display_name, role, team_no)
-values ('worker02', '1002', '작업자02', 'worker', 2);
+insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type)
+values ('worker02', '1002', '작업자02', 'worker', 2, 1, '모뎀작업자');
 ```
 
 관리자 계정 예시:
 
 ```sql
-insert into public.work_users (login_id, password, display_name, role, team_no)
-values ('admin2', '9998', '관리자2', 'admin', null);
+insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type)
+values ('admin2', '9998', '관리자2', 'admin', 0, 0, '관리자');
 ```
 
 ## 기능
