@@ -1,30 +1,35 @@
 # 실적관리 사이트
 
-Render 환경변수에 Supabase URL과 publishable key를 두고, 사용자는 아이디/패스워드로 로그인해 날짜별 수량을 입력합니다.
+Supabase에 연결된 실적관리 앱입니다. 사용자는 아이디/패스워드로 로그인해 날짜별 수량을 입력합니다.
 
 ## 현재 연결 정보
 
 - Supabase URL: `https://blbmdnygvoqyrovvlrrh.supabase.co`
-- Publishable Key: 아직 입력 필요
+- Publishable Key: `config.js`와 Render 빌드 스크립트에 반영됨
 
-브라우저에서 Supabase를 사용하려면 publishable key 또는 anon public key가 반드시 필요합니다. Render에서는 아래 환경변수를 설정하세요.
+Render에서는 아래 환경변수를 설정하면 해당 값이 우선 적용됩니다. 환경변수가 없어도 현재 Supabase 프로젝트 기본값으로 `config.js`가 생성됩니다.
 
 - `SUPABASE_URL`
 - `SUPABASE_PUBLISHABLE_KEY`
 
-Render의 Build Command는 `npm run build`, Publish Directory는 프로젝트 루트(`.`)로 설정하면 `config.js`가 환경변수 값으로 생성됩니다.
+Render의 Build Command는 `npm run build`, Publish Directory는 프로젝트 루트(`.`)로 설정합니다.
 
 ## Supabase 설정
 
-1. Supabase Dashboard의 SQL Editor에서 `supabase-schema.sql`을 실행합니다.
-2. `work_users` 테이블에 사용자를 추가합니다.
-3. 앱에 접속해 `login_id`와 패스워드로 로그인합니다.
+현재 프로젝트에는 앱에서 필요한 `work_settings`, `work_users`, `work_records` 테이블과 `work_login` 함수가 생성되어 있습니다.
 
-사용자 생성 예시:
+사용자를 추가하려면 Supabase SQL Editor에서 실행하세요.
 
 ```sql
 insert into public.work_users (login_id, password_hash, display_name, role)
-values ('worker01', crypt('1234', gen_salt('bf')), '작업자01', 'user');
+values ('worker01', extensions.crypt('1234', extensions.gen_salt('bf')), '작업자01', 'user');
+```
+
+관리자 계정 예시:
+
+```sql
+insert into public.work_users (login_id, password_hash, display_name, role)
+values ('admin', extensions.crypt('admin1234', extensions.gen_salt('bf')), '관리자', 'admin');
 ```
 
 ## 기능
