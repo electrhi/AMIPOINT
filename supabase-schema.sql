@@ -9,9 +9,10 @@ create table if not exists public.work_settings (
 create table if not exists public.work_users (
   id uuid primary key default gen_random_uuid(),
   login_id text not null unique,
-  password_hash text not null,
+  password text not null,
   display_name text not null,
   role text not null default 'worker' check (role in ('admin', 'worker')),
+  team_no integer check (team_no is null or team_no > 0),
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -84,17 +85,18 @@ returns table (
   user_id uuid,
   login_id text,
   display_name text,
-  role text
+  role text,
+  team_no integer
 )
 language sql
 security definer
 set search_path = public
 as $$
-  select id, work_users.login_id, work_users.display_name, work_users.role
+  select id, work_users.login_id, work_users.display_name, work_users.role, work_users.team_no
   from public.work_users
   where work_users.login_id = p_login_id
     and work_users.is_active = true
-    and work_users.password_hash = extensions.crypt(p_password, work_users.password_hash)
+    and work_users.password = p_password
   limit 1;
 $$;
 
@@ -107,9 +109,9 @@ on conflict (id) do update
 set value = excluded.value,
     updated_at = now();
 
--- 사용자 생성 예시입니다. password_hash에는 평문이 아니라 crypt 해시가 저장됩니다.
--- insert into public.work_users (login_id, password_hash, display_name, role)
--- values ('worker01', extensions.crypt('worker1234', extensions.gen_salt('bf')), '작업자01', 'worker');
+-- 사용자 생성 예시입니다. password에는 숫자/문자 비밀번호가 그대로 저장됩니다.
+-- insert into public.work_users (login_id, password, display_name, role, team_no)
+-- values ('worker01', '1001', '작업자01', 'worker', 1);
 --
--- insert into public.work_users (login_id, password_hash, display_name, role)
--- values ('admin', extensions.crypt('admin1234', extensions.gen_salt('bf')), '관리자', 'admin');
+-- insert into public.work_users (login_id, password, display_name, role, team_no)
+-- values ('admin', '9999', '관리자', 'admin', null);
