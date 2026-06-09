@@ -130,7 +130,9 @@ async function login(event) {
     loginId: user.login_id,
     displayName: user.display_name || user.login_id,
     role: user.role || "worker",
-    teamNo: user.team_no ? Number(user.team_no) : null,
+    teamNo: user.team_no !== null && user.team_no !== undefined ? Number(user.team_no) : null,
+    regionNo: user.region_no !== null && user.region_no !== undefined ? Number(user.region_no) : null,
+    workerType: user.worker_type || "",
   };
 
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(sessionUser));
@@ -146,7 +148,9 @@ async function completeLogin(user) {
   elements.adminView.hidden = state.user.role !== "admin";
   elements.workerView.hidden = state.user.role !== "worker";
   elements.sessionText.textContent = `${state.user.displayName || state.user.loginId} · ${
-    state.user.role === "admin" ? "관리자" : `${state.user.teamNo || "-"}조 작업자`
+    state.user.role === "admin"
+      ? "관리자"
+      : `${state.user.regionNo ?? "-"}권역 · ${state.user.teamNo || "-"}조 ${state.user.workerType || "작업자"}`
   }`;
   renderSettings();
 
@@ -282,7 +286,7 @@ async function loadAdminRecords() {
 
 function createBlankRecords() {
   const records = [];
-  const teamNumbers = state.user?.role === "worker" ? [Number(state.user.teamNo || 1)] : getAllTeamNumbers();
+  const teamNumbers = getVisibleTeamNumbers();
 
   for (const teamNo of teamNumbers) {
     for (const period of PERIODS) {
@@ -334,10 +338,26 @@ function getAllTeamNumbers() {
   return Array.from({ length: state.settings.teamCount }, (_, index) => index + 1);
 }
 
+function getVisibleTeamNumbers() {
+  if (state.user?.role !== "worker") return getAllTeamNumbers();
+  return state.user.teamNo && state.user.teamNo > 0 ? [Number(state.user.teamNo)] : [];
+}
+
 function renderRecords() {
   elements.recordsBody.innerHTML = "";
   elements.recordsFoot.innerHTML = "";
-  const teamNumbers = state.user?.role === "worker" ? [Number(state.user.teamNo || 1)] : getAllTeamNumbers();
+  const teamNumbers = getVisibleTeamNumbers();
+
+  if (!teamNumbers.length) {
+    const row = document.createElement("tr");
+    const cell = createTextCell("담당 조가 지정되지 않았습니다.");
+    cell.colSpan = 8;
+    row.append(cell);
+    elements.recordsBody.append(row);
+    renderFoot();
+    renderSummary();
+    return;
+  }
 
   for (const teamNo of teamNumbers) {
     const row = document.createElement("tr");
