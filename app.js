@@ -225,10 +225,16 @@ async function saveSettings() {
 async function loadRecords() {
   if (!state.user || state.user.role !== "worker") return;
 
-  const { data, error } = await state.client
+  let query = state.client
     .from("work_records")
     .select("*")
-    .eq("work_date", elements.workDate.value)
+    .eq("work_date", elements.workDate.value);
+
+  query = state.user.regionNo === null || state.user.regionNo === undefined
+    ? query.is("region_no", null)
+    : query.eq("region_no", state.user.regionNo);
+
+  const { data, error } = await query
     .order("team_no")
     .order("period")
     .order("work_type");
@@ -248,7 +254,7 @@ async function saveRecords() {
   syncInputsToState();
   const payload = state.records.map(toDbRecord);
   const { error } = await state.client.from("work_records").upsert(payload, {
-    onConflict: "work_date,team_no,period,work_type",
+    onConflict: "work_date,region_no,team_no,period,work_type",
   });
 
   if (error) {
@@ -267,10 +273,11 @@ async function loadAdminRecords() {
   const to = elements.adminDateTo.value;
   const { data, error } = await state.client
     .from("work_records")
-    .select("work_date, team_no, period, work_type, actual_qty, updated_at")
+    .select("work_date, region_no, team_no, period, work_type, actual_qty, updated_at")
     .gte("work_date", from)
     .lte("work_date", to)
     .order("work_date")
+    .order("region_no")
     .order("team_no")
     .order("period")
     .order("work_type");
@@ -293,6 +300,7 @@ function createBlankRecords() {
       for (const type of WORK_TYPES) {
         records.push({
           workDate: elements.workDate.value,
+          regionNo: state.user?.regionNo ?? null,
           teamNo,
           period: period.key,
           workType: type.key,
@@ -317,10 +325,11 @@ function buildAdminRows(records) {
   const grouped = new Map();
 
   for (const record of records) {
-    const key = `${record.workDate}:${record.teamNo}`;
+    const key = `${record.workDate}:${record.regionNo ?? ""}:${record.teamNo}`;
     if (!grouped.has(key)) {
       grouped.set(key, {
         workDate: record.workDate,
+        regionNo: record.regionNo,
         teamNo: record.teamNo,
         values: {
           morning: { joint: 0, move: 0, existing: 0 },
@@ -331,7 +340,12 @@ function buildAdminRows(records) {
     grouped.get(key).values[record.period][record.workType] = Number(record.actualQty || 0);
   }
 
-  return [...grouped.values()].sort((a, b) => `${a.workDate}:${a.teamNo}`.localeCompare(`${b.workDate}:${b.teamNo}`));
+  return [...grouped.values()].sort(
+    (a, b) =>
+      a.workDate.localeCompare(b.workDate) ||
+      Number(a.regionNo ?? 9999) - Number(b.regionNo ?? 9999) ||
+      Number(a.teamNo) - Number(b.teamNo),
+  );
 }
 
 function getAllTeamNumbers() {
@@ -341,6 +355,10 @@ function getAllTeamNumbers() {
 function getVisibleTeamNumbers() {
   if (state.user?.role !== "worker") return getAllTeamNumbers();
   return state.user.teamNo && state.user.teamNo > 0 ? [Number(state.user.teamNo)] : [];
+}
+
+function formatRegion(regionNo) {
+  return regionNo === null || regionNo === undefined ? "-" : `${regionNo}권역`;
 }
 
 function renderRecords() {
@@ -385,7 +403,7 @@ function renderAdminRecords() {
 
   for (const item of state.adminRows) {
     const row = document.createElement("tr");
-    row.append(createTextCell(item.workDate), createTextCell(`${item.teamNo}조`));
+    row.append(createTextCell(item.workDate), createTextCell(formatRegion(item.regionNo)), createTextCell(`${item.teamNo}조`));
     for (const period of PERIODS) {
       for (const type of WORK_TYPES) {
         row.append(createTextCell(item.values[period.key][type.key]));
@@ -396,7 +414,7 @@ function renderAdminRecords() {
   }
 
   const foot = document.createElement("tr");
-  foot.append(createTextCell("합계", "th"), createTextCell(""));
+  foot.append(createTextCell("합계", "th"), createTextCell(""), createTextCell(""));
   for (const period of PERIODS) {
     for (const type of WORK_TYPES) {
       foot.append(createTextCell(getAdminTypeTotal(period.key, type.key)));
@@ -496,15 +514,17 @@ function getAdminGrandTotal() {
 }
 
 function downloadAdminExcel() {
-  const headerRows = [["날짜", "조", "오전 합동", "오전 이전", "오전 기존", "오후 합동", "오후 이전", "오후 기존", "합계"]];
+  const headerRows = [["날짜", "권역", "조", "오전 합동", "오전 이전", "오전 기존", "오후 합동", "오후 이전", "오후 기존", "합계"]];
   const bodyRows = state.adminRows.map((row) => [
     row.workDate,
+    formatRegion(row.regionNo),
     `${row.teamNo}조`,
     ...PERIODS.flatMap((period) => WORK_TYPES.map((type) => row.values[period.key][type.key])),
     getAdminRowTotal(row),
   ]);
   bodyRows.push([
     "합계",
+    "",
     "",
     ...PERIODS.flatMap((period) => WORK_TYPES.map((type) => getAdminTypeTotal(period.key, type.key))),
     getAdminGrandTotal(),
@@ -525,6 +545,7 @@ function downloadAdminExcel() {
 function toDbRecord(record) {
   return {
     work_date: record.workDate,
+    region_no: record.regionNo,
     team_no: record.teamNo,
     period: record.period,
     work_type: record.workType,
@@ -537,6 +558,7 @@ function toDbRecord(record) {
 function fromDbRecord(record) {
   return {
     workDate: record.work_date,
+    regionNo: record.region_no,
     teamNo: record.team_no,
     period: record.period,
     workType: record.work_type,
@@ -545,7 +567,7 @@ function fromDbRecord(record) {
 }
 
 function recordKey(record) {
-  return `${record.workDate}:${record.teamNo}:${record.period}:${record.workType}`;
+  return `${record.workDate}:${record.regionNo ?? ""}:${record.teamNo}:${record.period}:${record.workType}`;
 }
 
 function normalizeSettings(settings) {
