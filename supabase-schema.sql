@@ -11,7 +11,7 @@ create table if not exists public.work_users (
   login_id text not null unique,
   password_hash text not null,
   display_name text not null,
-  role text not null default 'user' check (role in ('admin', 'user')),
+  role text not null default 'worker' check (role in ('admin', 'worker')),
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -88,7 +88,7 @@ returns table (
 )
 language sql
 security definer
-set search_path = public, extensions
+set search_path = public
 as $$
   select id, work_users.login_id, work_users.display_name, work_users.role
   from public.work_users
@@ -109,7 +109,7 @@ set value = excluded.value,
 
 -- 사용자 생성 예시입니다. password_hash에는 평문이 아니라 crypt 해시가 저장됩니다.
 -- insert into public.work_users (login_id, password_hash, display_name, role)
--- values ('worker01', extensions.crypt('1234', extensions.gen_salt('bf')), '작업자01', 'user');
+-- values ('worker01', extensions.crypt('worker1234', extensions.gen_salt('bf')), '작업자01', 'worker');
 --
 -- insert into public.work_users (login_id, password_hash, display_name, role)
 -- values ('admin', extensions.crypt('admin1234', extensions.gen_salt('bf')), '관리자', 'admin');
