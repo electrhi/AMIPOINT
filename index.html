@@ -14,7 +14,7 @@
         <div class="login-panel">
           <div class="brand-block">
             <h1>실적관리</h1>
-            <p>아이디와 패스워드로 로그인한 뒤 날짜별 수량을 입력합니다.</p>
+            <p>아이디와 패스워드로 로그인한 뒤 권한에 맞는 화면으로 이동합니다.</p>
           </div>
 
           <form id="loginForm" class="login-form">
@@ -44,53 +44,112 @@
           </div>
         </header>
 
-        <section class="control-band">
-          <div class="field">
-            <label for="workDate">조회 날짜</label>
-            <input id="workDate" type="date" />
-          </div>
-          <div class="field admin-only">
-            <label for="teamCount">조 수량</label>
-            <input id="teamCount" type="number" min="1" max="100" value="4" />
-          </div>
-          <button id="saveSettingsButton" class="admin-only">조 수량 저장</button>
-          <button id="reloadButton">조회</button>
+        <section id="adminView" hidden>
+          <section class="control-band admin-controls">
+            <div class="field">
+              <label for="adminDateFrom">시작일</label>
+              <input id="adminDateFrom" type="date" />
+            </div>
+            <div class="field">
+              <label for="adminDateTo">종료일</label>
+              <input id="adminDateTo" type="date" />
+            </div>
+            <div class="field">
+              <label for="teamCount">조 수량</label>
+              <input id="teamCount" type="number" min="1" max="100" value="4" />
+            </div>
+            <button id="saveSettingsButton">조 수량 저장</button>
+            <button id="loadAdminButton" class="primary">전체 조회</button>
+            <button id="downloadButton">엑셀 다운로드</button>
+          </section>
+
+          <section class="summary-grid" aria-label="관리자 요약">
+            <div class="metric">
+              <span>조회 기간</span>
+              <strong id="adminRangeText">-</strong>
+            </div>
+            <div class="metric">
+              <span>전체 입력</span>
+              <strong id="adminTotalText">0개</strong>
+            </div>
+            <div class="metric">
+              <span>입력 일자</span>
+              <strong id="adminDateCountText">0일</strong>
+            </div>
+          </section>
+
+          <section class="work-area">
+            <div class="toolbar">
+              <div class="section-heading">
+                <h2>전체 실적 현황</h2>
+                <p>관리자는 모든 날짜와 모든 조의 입력 내역을 확인합니다.</p>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table id="adminTable">
+                <thead>
+                  <tr>
+                    <th>날짜</th>
+                    <th>조</th>
+                    <th>오전 합동</th>
+                    <th>오전 이전</th>
+                    <th>오전 기존</th>
+                    <th>오후 합동</th>
+                    <th>오후 이전</th>
+                    <th>오후 기존</th>
+                    <th>합계</th>
+                  </tr>
+                </thead>
+                <tbody id="adminBody"></tbody>
+                <tfoot id="adminFoot"></tfoot>
+              </table>
+            </div>
+          </section>
         </section>
 
-        <section class="work-area">
-          <div class="toolbar">
-            <div class="section-heading">
-              <h2>일일 수량 입력</h2>
-              <p id="summaryText">입력 0개</p>
+        <section id="workerView" hidden>
+          <section class="control-band worker-controls">
+            <div class="field">
+              <label for="workDate">조회 날짜</label>
+              <input id="workDate" type="date" />
             </div>
-            <div class="button-row">
-              <button id="saveRecordsButton" class="primary">저장</button>
-              <button id="downloadButton" class="admin-only">엑셀 다운로드</button>
-            </div>
-          </div>
+            <button id="reloadButton">조회</button>
+          </section>
 
-          <div class="table-wrap">
-            <table id="recordsTable">
-              <thead>
-                <tr>
-                  <th rowspan="2">조</th>
-                  <th colspan="3">오전</th>
-                  <th colspan="3">오후</th>
-                  <th rowspan="2">합계</th>
-                </tr>
-                <tr>
-                  <th>합동</th>
-                  <th>이전</th>
-                  <th>기존</th>
-                  <th>합동</th>
-                  <th>이전</th>
-                  <th>기존</th>
-                </tr>
-              </thead>
-              <tbody id="recordsBody"></tbody>
-              <tfoot id="recordsFoot"></tfoot>
-            </table>
-          </div>
+          <section class="work-area">
+            <div class="toolbar">
+              <div class="section-heading">
+                <h2>일일 수량 입력</h2>
+                <p id="summaryText">입력 0개</p>
+              </div>
+              <div class="button-row">
+                <button id="saveRecordsButton" class="primary">저장</button>
+              </div>
+            </div>
+
+            <div class="table-wrap">
+              <table id="recordsTable">
+                <thead>
+                  <tr>
+                    <th rowspan="2">조</th>
+                    <th colspan="3">오전</th>
+                    <th colspan="3">오후</th>
+                    <th rowspan="2">합계</th>
+                  </tr>
+                  <tr>
+                    <th>합동</th>
+                    <th>이전</th>
+                    <th>기존</th>
+                    <th>합동</th>
+                    <th>이전</th>
+                    <th>기존</th>
+                  </tr>
+                </thead>
+                <tbody id="recordsBody"></tbody>
+                <tfoot id="recordsFoot"></tfoot>
+              </table>
+            </div>
+          </section>
         </section>
       </section>
     </main>
