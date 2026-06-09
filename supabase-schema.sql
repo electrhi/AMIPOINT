@@ -88,13 +88,13 @@ returns table (
 )
 language sql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
   select id, work_users.login_id, work_users.display_name, work_users.role
   from public.work_users
   where work_users.login_id = p_login_id
     and work_users.is_active = true
-    and work_users.password_hash = crypt(p_password, work_users.password_hash)
+    and work_users.password_hash = extensions.crypt(p_password, work_users.password_hash)
   limit 1;
 $$;
 
@@ -109,7 +109,7 @@ set value = excluded.value,
 
 -- 사용자 생성 예시입니다. password_hash에는 평문이 아니라 crypt 해시가 저장됩니다.
 -- insert into public.work_users (login_id, password_hash, display_name, role)
--- values ('worker01', crypt('1234', gen_salt('bf')), '작업자01', 'user');
+-- values ('worker01', extensions.crypt('1234', extensions.gen_salt('bf')), '작업자01', 'user');
 --
 -- insert into public.work_users (login_id, password_hash, display_name, role)
--- values ('admin', crypt('admin1234', gen_salt('bf')), '관리자', 'admin');
+-- values ('admin', extensions.crypt('admin1234', extensions.gen_salt('bf')), '관리자', 'admin');
