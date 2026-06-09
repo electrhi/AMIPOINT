@@ -130,6 +130,7 @@ async function login(event) {
     loginId: user.login_id,
     displayName: user.display_name || user.login_id,
     role: user.role || "worker",
+    teamNo: user.team_no ? Number(user.team_no) : null,
   };
 
   localStorage.setItem(STORAGE_KEYS.session, JSON.stringify(sessionUser));
@@ -145,7 +146,7 @@ async function completeLogin(user) {
   elements.adminView.hidden = state.user.role !== "admin";
   elements.workerView.hidden = state.user.role !== "worker";
   elements.sessionText.textContent = `${state.user.displayName || state.user.loginId} · ${
-    state.user.role === "admin" ? "관리자" : "작업자"
+    state.user.role === "admin" ? "관리자" : `${state.user.teamNo || "-"}조 작업자`
   }`;
   renderSettings();
 
@@ -281,8 +282,9 @@ async function loadAdminRecords() {
 
 function createBlankRecords() {
   const records = [];
+  const teamNumbers = state.user?.role === "worker" ? [Number(state.user.teamNo || 1)] : getAllTeamNumbers();
 
-  for (let teamNo = 1; teamNo <= state.settings.teamCount; teamNo += 1) {
+  for (const teamNo of teamNumbers) {
     for (const period of PERIODS) {
       for (const type of WORK_TYPES) {
         records.push({
@@ -328,11 +330,16 @@ function buildAdminRows(records) {
   return [...grouped.values()].sort((a, b) => `${a.workDate}:${a.teamNo}`.localeCompare(`${b.workDate}:${b.teamNo}`));
 }
 
+function getAllTeamNumbers() {
+  return Array.from({ length: state.settings.teamCount }, (_, index) => index + 1);
+}
+
 function renderRecords() {
   elements.recordsBody.innerHTML = "";
   elements.recordsFoot.innerHTML = "";
+  const teamNumbers = state.user?.role === "worker" ? [Number(state.user.teamNo || 1)] : getAllTeamNumbers();
 
-  for (let teamNo = 1; teamNo <= state.settings.teamCount; teamNo += 1) {
+  for (const teamNo of teamNumbers) {
     const row = document.createElement("tr");
     const teamHeader = document.createElement("th");
     teamHeader.textContent = `${teamNo}조`;
