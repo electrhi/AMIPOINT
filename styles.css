@@ -1,0 +1,268 @@
+:root {
+  color-scheme: light;
+  font-family: "Segoe UI", "Malgun Gothic", Arial, sans-serif;
+  background: #f4f6f8;
+  color: #1d252d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  min-height: 40px;
+  border: 1px solid #c7d0d9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #1d252d;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+button:hover {
+  border-color: #7f95a8;
+}
+
+button.primary {
+  border-color: #126b5b;
+  background: #126b5b;
+  color: #ffffff;
+}
+
+input {
+  width: 100%;
+  min-height: 40px;
+  border: 1px solid #c7d0d9;
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: #ffffff;
+  color: #1d252d;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.app-shell {
+  width: min(1440px, 100%);
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.login-view {
+  min-height: calc(100vh - 48px);
+  display: grid;
+  place-items: center;
+}
+
+.login-panel {
+  width: min(520px, 100%);
+  background: #ffffff;
+  border: 1px solid #d9e0e6;
+  border-radius: 8px;
+  padding: 28px;
+}
+
+.brand-block {
+  margin-bottom: 22px;
+}
+
+.brand-block p,
+.topbar p,
+.section-heading p,
+.message {
+  margin-top: 6px;
+  color: #657482;
+}
+
+.config-grid,
+.login-form {
+  display: grid;
+  gap: 14px;
+}
+
+.config-grid {
+  margin-bottom: 20px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e6ebef;
+}
+
+.topbar,
+.control-band,
+.work-area {
+  background: #ffffff;
+  border: 1px solid #d9e0e6;
+  border-radius: 8px;
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  padding: 20px 22px;
+}
+
+.top-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+h1,
+h2,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 28px;
+  letter-spacing: 0;
+}
+
+h2 {
+  font-size: 18px;
+  letter-spacing: 0;
+}
+
+.connection {
+  min-width: 106px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: #eef3f7;
+  color: #435363;
+  text-align: center;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.connection.connected {
+  background: #def7ea;
+  color: #126b38;
+}
+
+.control-band {
+  display: grid;
+  grid-template-columns: 180px 160px max-content max-content;
+  gap: 14px;
+  align-items: end;
+  margin-top: 16px;
+  padding: 16px;
+}
+
+.work-area {
+  margin-top: 16px;
+  padding: 18px;
+}
+
+.field {
+  display: grid;
+  gap: 7px;
+}
+
+label {
+  color: #435363;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.button-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.button-row button,
+.control-band button {
+  padding: 0 14px;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 16px;
+}
+
+.table-wrap {
+  overflow: auto;
+  border: 1px solid #d9e0e6;
+  border-radius: 8px;
+}
+
+table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e6ebef;
+  border-right: 1px solid #e6ebef;
+  padding: 10px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th:last-child,
+td:last-child {
+  border-right: 0;
+}
+
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #edf3f1;
+  color: #21342f;
+  font-size: 14px;
+}
+
+tbody th {
+  width: 74px;
+  background: #fafbfc;
+}
+
+tfoot td,
+tfoot th {
+  background: #f6f8fa;
+  font-weight: 800;
+}
+
+.quantity-cell {
+  display: grid;
+  min-width: 84px;
+}
+
+.quantity-cell input {
+  min-width: 78px;
+  text-align: right;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 14px;
+  }
+
+  .topbar,
+  .toolbar,
+  .top-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .control-band {
+    grid-template-columns: 1fr;
+  }
+}
