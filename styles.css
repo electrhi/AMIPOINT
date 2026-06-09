@@ -159,6 +159,42 @@ h2 {
   padding: 16px;
 }
 
+.admin-controls {
+  grid-template-columns: repeat(3, minmax(150px, 180px)) repeat(3, max-content);
+}
+
+.worker-controls {
+  grid-template-columns: 180px max-content;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.metric {
+  display: grid;
+  gap: 6px;
+  min-height: 82px;
+  padding: 16px;
+  border: 1px solid #d9e0e6;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.metric span {
+  color: #657482;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.metric strong {
+  color: #1d252d;
+  font-size: 22px;
+}
+
 .work-area {
   margin-top: 16px;
   padding: 18px;
@@ -262,7 +298,10 @@ tfoot th {
     flex-direction: column;
   }
 
-  .control-band {
+  .control-band,
+  .admin-controls,
+  .worker-controls,
+  .summary-grid {
     grid-template-columns: 1fr;
   }
 }
