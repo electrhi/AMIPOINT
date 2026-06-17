@@ -17,7 +17,8 @@ Render의 Build Command는 `npm run build`, Publish Directory는 프로젝트 �
 ## 기본 생성 계정
 
 - 관리자/작업자 계정은 Supabase `work_users`에 일괄 추가되어 있습니다.
-- 계정별 `password`, `team_no`, `region_no`, `worker_type`을 Table Editor에서 확인할 수 있습니다.
+- 계정별 `password`, `team_no`, `region_no`, `worker_type`, `data_file`, `can_view_others`를 Table Editor에서 확인할 수 있습니다.
+- `can_view_others=true` 계정은 관리자 권한으로 로그인됩니다.
 - `team_no`가 비어 있는 작업자는 로그인은 가능하지만 입력 표가 표시되지 않습니다.
 
 비밀번호는 Supabase `work_users.password`에 숫자/문자 그대로 저장됩니다.
@@ -25,15 +26,15 @@ Render의 Build Command는 `npm run build`, Publish Directory는 프로젝트 �
 ## 사용자 추가 예시
 
 ```sql
-insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type)
-values ('worker02', '1002', '작업자02', 'worker', 2, 1, '모뎀작업자');
+insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type, data_file, can_view_others)
+values ('worker02', '1002', '작업자02', 'worker', 2, 1, '모뎀작업자', '26BG_sample.xlsx', false);
 ```
 
 관리자 계정 예시:
 
 ```sql
-insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type)
-values ('admin2', '9998', '관리자2', 'admin', 0, 0, '관리자');
+insert into public.work_users (login_id, password, display_name, role, team_no, region_no, worker_type, data_file, can_view_others)
+values ('admin2', '9998', '관리자2', 'admin', 0, 0, '관리자', null, true);
 ```
 
 ## 기능

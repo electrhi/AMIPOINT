@@ -15,6 +15,8 @@ create table if not exists public.work_users (
   team_no integer check (team_no is null or team_no >= 0),
   region_no integer check (region_no is null or region_no >= 0),
   worker_type text,
+  data_file text,
+  can_view_others boolean not null default false,
   is_active boolean not null default true,
   created_at timestamptz not null default now()
 );
@@ -23,6 +25,8 @@ alter table public.work_users add column if not exists password text;
 alter table public.work_users add column if not exists team_no integer;
 alter table public.work_users add column if not exists region_no integer;
 alter table public.work_users add column if not exists worker_type text;
+alter table public.work_users add column if not exists data_file text;
+alter table public.work_users add column if not exists can_view_others boolean not null default false;
 alter table public.work_users drop constraint if exists work_users_team_no_check;
 alter table public.work_users add constraint work_users_team_no_check check (team_no is null or team_no >= 0);
 alter table public.work_users drop constraint if exists work_users_region_no_check;
